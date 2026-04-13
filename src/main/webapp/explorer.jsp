@@ -13,7 +13,15 @@
 <body>
     <c:set var="title" value="Проводник" />
     <div class="container shadow-lg p-5 mt-5 mb-5 bg-white rounded">
-        <h1 class="mb-4">${title}</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-4">${title}</h1>
+            <div>
+                <span class="me-3">Ваш логин: ${username}</span>
+                <a href="logout" class="btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </a>
+            </div>
+        </div>
         <div class="content">
             <p><i class="bi bi-clock-history"></i> Время: ${currentTime}</p>
             <p><i class="bi bi-folder"></i> Текущий путь: ${currentPath.replace("\\", " > ")}</p>
