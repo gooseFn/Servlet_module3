@@ -24,12 +24,23 @@ public class DirectoryServlet extends HttpServlet {
         else {
             String username = (String) session.getAttribute("username");
             String homeDir = System.getProperty("user.home") + "\\" + "filemanager" + "\\" + username + "\\";
-
+            File homeDirFile = new File(homeDir);
+            String canonicalHomeDir = homeDirFile.getCanonicalPath() + "\\";
             String path = req.getParameter("path");
-            if (path == null || path.isEmpty() || !path.startsWith(homeDir))
-                path = homeDir;
-
-            File directory = new File(path);
+            File requestedFile;
+            if (path == null || path.isEmpty())
+                requestedFile = homeDirFile;
+            else
+                requestedFile = new File(path);
+            String canonicalRequested = requestedFile.getCanonicalPath();
+            if (!canonicalRequested.startsWith(canonicalHomeDir)) {
+                requestedFile = homeDirFile;
+                path = requestedFile.getAbsolutePath();
+            }
+            else {
+                path = canonicalRequested;
+            }
+            File directory = requestedFile;
             if (!directory.exists()) {
                 directory.mkdir();
             }

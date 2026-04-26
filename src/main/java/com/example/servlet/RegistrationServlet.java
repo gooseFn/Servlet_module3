@@ -1,7 +1,7 @@
 package com.example.servlet;
 
 import com.example.servlet.models.User;
-import com.example.servlet.models.UserStorage;
+import com.example.servlet.models.UsersDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 @WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
@@ -23,16 +24,20 @@ public class RegistrationServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String email = req.getParameter("email");
-        if (UserStorage.getUser(username) == null) {
-            User newUser = new User(username, password, email);
-            UserStorage.addUser(newUser);
-            req.getSession().setAttribute("username", username);
-            resp.sendRedirect(req.getContextPath() + "/files");
-        }
+        try {
+            if (UsersDAO.getUser(username) == null) {
+                User newUser = new User(username, password, email);
+                UsersDAO.addUser(newUser);
+                req.getSession().setAttribute("username", username);
+                resp.sendRedirect(req.getContextPath() + "/files");
+            }
 
-        else {
-            req.setAttribute("error", "Пользователь с таким именем уже существует!");
-            req.getRequestDispatcher("/registration.jsp").forward(req, resp);
+            else {
+                req.setAttribute("error", "Пользователь с таким именем уже существует!");
+                req.getRequestDispatcher("/registration.jsp").forward(req, resp);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

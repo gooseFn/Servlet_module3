@@ -184,3 +184,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Environment variables (секреты)
+src/main/resources/.env
+
+# Sessions (Tomcat persistent sessions)
+sessions/
