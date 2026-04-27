@@ -4,11 +4,6 @@ import com.example.servlet.dbService.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class UsersDAO {
 
     public static void addUser(User user) {
@@ -22,7 +17,7 @@ public class UsersDAO {
 
     }
 
-    public static User getUser(String username) throws SQLException {
+    public static User getUser(String username) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.byNaturalId(User.class).using("username", username).load();
         } catch (Exception e) {
@@ -30,7 +25,7 @@ public class UsersDAO {
         }
     }
 
-    public static boolean validateUser(String username, String password) throws SQLException {
+    public static boolean validateUser(String username, String password) {
         User user = getUser(username);
         return user != null && user.getPassword().equals(password);
     }
