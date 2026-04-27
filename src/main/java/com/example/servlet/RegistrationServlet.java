@@ -36,7 +36,7 @@ public class RegistrationServlet extends HttpServlet {
                 req.setAttribute("error", "Пользователь с таким именем уже существует!");
                 req.getRequestDispatcher("/registration.jsp").forward(req, resp);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

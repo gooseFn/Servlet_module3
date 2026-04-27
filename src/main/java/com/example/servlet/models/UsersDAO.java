@@ -1,6 +1,8 @@
 package com.example.servlet.models;
 
-import com.example.servlet.dbService.DatabaseConnection;
+import com.example.servlet.dbService.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,32 +11,23 @@ import java.sql.SQLException;
 
 public class UsersDAO {
 
-    public static void addUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getEmail());
-            statement.executeUpdate();
+    public static void addUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.persist(user);
+            transaction.commit();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка добавления пользователя", e);
         }
+
     }
 
     public static User getUser(String username) throws SQLException {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new User(
-                        resultSet.getString("username"),
-                        resultSet.getString("password"),
-                        resultSet.getString("email")
-                );
-            }
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.byNaturalId(User.class).using("username", username).load();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка поиска пользователя: " + username, e);
         }
-        return null;
     }
 
     public static boolean validateUser(String username, String password) throws SQLException {
